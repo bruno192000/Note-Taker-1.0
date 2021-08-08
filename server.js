@@ -1,65 +1,73 @@
-const PORT = process.env.PORT || 3001;
-const fs = require('fs');
-const path = require('path');
 
 const express = require('express');
-const app = express();
+const note = require('./db/db.json'); 
+const axe = require('path');
+const fs = require('fs');
+const another = express();
+const PORT = process.env.PORT || 2000;
 
-const allNotes = require('./db/db.json');
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static('public'));
+another.use(express.urlencoded({ extended: true }));
 
-app.get('/api/notes', (req, res) => {
-    res.json(allNotes.slice(1));
+another.use(express.json());
+
+another.get('/notes', (req, res) => {
+    res.sendFile(axe.join(__dirname, './public/notes.html'));
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/index.html'));
+
+
+another.get('/api/notes', (req, res) => {res.json(note.slice(1));
 });
 
-app.get('/notes', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/notes.html'));
+another.use(express.static('public'));
+another.get('*', (req, res) => {res.sendFile(axe.join(__dirname, './public/index.html'));
 });
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/index.html'));
+another.get('/', (req, res) => { res.sendFile(axe.join(__dirname, './public/index.html'));
 });
 
-function createNewNote(body, notesArray) {
-    const newNote = body;
-    if (!Array.isArray(notesArray))
-        notesArray = [];
+
+
+
+function creacion(body, notas) {
+    const nuevas = body;
     
-    if (notesArray.length === 0)
-        notesArray.push(0);
+    if (!Array.isArray(notas))
+        notas = [];
+    
+    if (notas.length === 0)
+        notas.push(0);
 
-    body.id = notesArray[0];
-    notesArray[0]++;
+    body.id = notas[0];
+    notas[0]++;
 
-    notesArray.push(newNote);
+    notas.push(nuevas);
+    
+    
     fs.writeFileSync(
-        path.join(__dirname, './db/db.json'),
-        JSON.stringify(notesArray, null, 2)
+        axe.join(__dirname, './db/db.json'),
+        JSON.stringify(notas, null, 2)
     );
-    return newNote;
+    return nuevas;
 }
 
-app.post('/api/notes', (req, res) => {
-    const newNote = createNewNote(req.body, allNotes);
-    res.json(newNote);
+another.post('/api/notes', (req, res) => {
+    const nuevas = creacion(req.body, note);
+    res.json(nuevas);
 });
 
-function deleteNote(id, notesArray) {
-    for (let i = 0; i < notesArray.length; i++) {
-        let note = notesArray[i];
+function eraser(id, notas) 
+    
+    {for 
+        (let i = 0; i < notas.length; i++) {
+        let note = notas[i];
 
-        if (note.id == id) {
-            notesArray.splice(i, 1);
+        if (note.id == id) 
+        {   notas.splice(i, 1);
             fs.writeFileSync(
-                path.join(__dirname, './db/db.json'),
-                JSON.stringify(notesArray, null, 2)
+                axe.join(__dirname, './db/db.json'),
+                JSON.stringify(notas, null, 2)
             );
 
             break;
@@ -67,11 +75,11 @@ function deleteNote(id, notesArray) {
     }
 }
 
-app.delete('/api/notes/:id', (req, res) => {
-    deleteNote(req.params.id, allNotes);
+another.delete('/api/notes/:id', (req, res) => {
+    eraser(req.params.id, note);
     res.json(true);
 });
 
-app.listen(PORT, () => {
-    console.log(`API server now on port ${PORT}!`);
+another.listen(PORT, () => {
+    console.log(`Your page is ready on localhost:${PORT}!`);
 });
